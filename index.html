@@ -29,7 +29,10 @@
             body { background: white !important; color: black !important; }
             .no-print { display: none !important; }
             .print-only { display: block !important; }
-            .print-container { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            .print-container { width: 100% !important; margin: 0 !important; padding: 0 !important; max-width: none !important; background: white !important; border: none !important; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; font-size: 11px; color: black !important; }
+            th { background-color: #f1f5f9 !important; }
         }
         .print-only { display: none; }
     </style>
@@ -46,7 +49,7 @@
                 <i class="fa-solid fa-hand-fist"></i>
             </div>
             <div>
-                <h1 class="font-bold text-base leading-tight">LA Sistemas e Controle-Jiu-Jitsu</h1>
+                <h1 class="font-bold text-base leading-tight">BJJ Controle</h1>
                 <p class="text-xs text-amber-400" id="sync-status"><i class="fa-solid fa-sync fa-spin"></i> Sincronizando...</p>
             </div>
         </div>
@@ -138,10 +141,7 @@
                 <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-chalkboard-user text-amber-400"></i> Professores</h3>
                 <form id="professor-form" onsubmit="addProfessor(event)" class="flex gap-2">
                     <input type="text" id="prof-name" placeholder="Nome do Professor" required class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-                    <!-- Dinamicamente preenchido com todas as faixas cadastradas -->
-                    <select id="prof-belt" required class="bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-                        <!-- options preenchidas por JS -->
-                    </select>
+                    <select id="prof-belt" required class="bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500"></select>
                     <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-2 rounded-xl text-xs"><i class="fa-solid fa-plus"></i></button>
                 </form>
                 <div id="professors-list" class="space-y-1.5 pt-2"></div>
@@ -209,11 +209,12 @@
                 </div>
                 <div class="flex gap-2 pt-2">
                     <button onclick="printReport()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold py-2.5 px-3 rounded-xl border border-slate-700 text-xs flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-file-pdf"></i> Salvar PDF / Imprimir
+                        <i class="fa-solid fa-file-pdf"></i> Salvar PDF / Imprimir Tabela
                     </button>
                 </div>
             </div>
 
+            <!-- Report Output Area -->
             <div id="report-output" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3 print-container">
                 <div class="text-center py-6 text-slate-500 text-xs">Selecione os filtros acima para gerar o relatório.</div>
             </div>
@@ -278,7 +279,7 @@
         // =========================================================================
         // INSIRA A SUA URL DO GOOGLE APPS SCRIPT NA LINHA ABAIXO:
         // =========================================================================
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygwI50ZXh0YsySsPFqvzxkuZNQVYOF181z4VELTV5ImUEOslDB3kR1UEfVnxI9r19n/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxy2UEl04xDSXJRAHRByDVxPfh7xIpNoNnjRKADFlmi6Jbf3cbRN-0APrS9hC8VEAU/exec';
 
         let state = {
             students: [],
@@ -626,7 +627,6 @@
             document.getElementById('student-modal').classList.add('hidden');
         }
 
-        // Correção: Função editStudent que faltava para abrir o modal de edição
         function editStudent(id) {
             openStudentModal(id);
         }
@@ -666,7 +666,6 @@
         }
 
         function renderCadastros() {
-            // Professores - Correção: Popular o select de faixa dinamicamente com state.belts
             const profBeltSelect = document.getElementById('prof-belt');
             if (profBeltSelect) {
                 profBeltSelect.innerHTML = state.belts.map(b => `<option value="${b.name}">Faixa ${b.name}</option>`).join('');
@@ -680,7 +679,6 @@
                 </div>
             `).join('') || '<div class="text-slate-500 text-xs text-center py-2">Nenhum professor.</div>';
 
-            // Faixas
             const beltContainer = document.getElementById('belts-list');
             beltContainer.innerHTML = state.belts.map(b => `
                 <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs">
@@ -692,7 +690,6 @@
                 </div>
             `).join('') || '<div class="text-slate-500 text-xs text-center py-2">Nenhuma faixa.</div>';
 
-            // Categorias
             const catContainer = document.getElementById('categories-list');
             catContainer.innerHTML = state.categories.map(c => `
                 <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-xl text-xs text-slate-200">
@@ -796,43 +793,74 @@
             if (endDate) logs = logs.filter(l => l.date <= endDate);
             if (studentId) logs = logs.filter(l => l.studentId === studentId);
 
-            if (logs.length === 0) {
-                output.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs">Nenhum registro encontrado.</div>`;
+            let uniqueClassDates = [...new Set(logs.map(l => l.date))];
+            let totalAulasPeriodo = uniqueClassDates.length;
+
+            if (logs.length === 0 || totalAulasPeriodo === 0) {
+                output.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs">Nenhum registro encontrado para o período selecionado.</div>`;
                 return;
             }
 
             let summary = {};
             state.students.forEach(s => {
                 if (!studentId || s.id === studentId) {
-                    summary[s.id] = { name: s.name, category: s.category, belt: s.belt, present: 0 };
+                    summary[s.id] = { name: s.name, category: s.category, belt: s.belt, present: 0, absent: 0 };
                 }
             });
 
             logs.forEach(l => {
                 if (!summary[l.studentId]) {
-                    summary[l.studentId] = { name: l.studentName, category: l.category, belt: l.belt, present: 0 };
+                    summary[l.studentId] = { name: l.studentName, category: l.category, belt: l.belt, present: 0, absent: 0 };
                 }
                 if (l.status === 'Presente') {
                     summary[l.studentId].present++;
+                } else {
+                    summary[l.studentId].absent++;
                 }
             });
 
+            let rowsHtml = Object.values(summary).map(st => {
+                let totalRegistrados = st.present + st.absent;
+                let percentual = totalRegistrados > 0 ? ((st.present / totalRegistrados) * 100).toFixed(1) : '0.0';
+                
+                return `
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #334155;">
+                            <div style="font-weight: bold; color: #f8fafc;">${st.name}</div>
+                            <div style="font-size: 10px; color: #94a3b8;">${st.category} • Faixa ${st.belt}</div>
+                        </td>
+                        <td style="padding: 10px; border-bottom: 1px solid #334155; text-align: center; color: #34d399; font-weight: bold;">
+                            ${st.present}
+                        </td>
+                        <td style="padding: 10px; border-bottom: 1px solid #334155; text-align: center; color: #f87171; font-weight: bold;">
+                            ${st.absent}
+                        </td>
+                        <td style="padding: 10px; border-bottom: 1px solid #334155; text-align: right; color: #fbbf24; font-weight: bold;">
+                            ${percentual}%
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
             output.innerHTML = `
-                <div class="space-y-3">
-                    <h3 class="font-bold text-xs text-amber-400 uppercase tracking-wider">Resumo de Presença</h3>
-                    <div class="divide-y divide-slate-800 space-y-2">
-                        ${Object.values(summary).map(st => `
-                            <div class="pt-2 flex items-center justify-between text-xs">
-                                <div>
-                                    <span class="font-bold text-slate-200 block">${st.name}</span>
-                                    <span class="text-slate-400">${st.category} • Faixa ${st.belt}</span>
-                                </div>
-                                <div class="text-right">
-                                    <span class="font-bold text-emerald-400">${st.present} presença(s)</span>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
+                <div class="print-only mb-4 pb-2 border-b border-slate-300">
+                    <h2 class="text-lg font-bold" style="color: black !important;">Relatório de Frequência - Jiu-Jitsu</h2>
+                    <p class="text-xs" style="color: #475569 !important;">Período: ${startDate ? startDate.split('-').reverse().join('/') : 'Início'} até ${endDate ? endDate.split('-').reverse().join('/') : 'Hoje'}</p>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #475569; text-align: left; color: #94a3b8;">
+                                <th style="padding: 8px;">Aluno</th>
+                                <th style="padding: 8px; text-align: center;">Presenças</th>
+                                <th style="padding: 8px; text-align: center;">Faltas</th>
+                                <th style="padding: 8px; text-align: right;">% Freq.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
                 </div>
             `;
         }
