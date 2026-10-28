@@ -127,7 +127,7 @@
             <div id="students-list" class="space-y-2"></div>
         </section>
 
-        <!-- TAB 3: CADASTROS & EQUIPE (Com gerador de Faixas!) -->
+        <!-- TAB 3: CADASTROS & EQUIPE -->
         <section id="tab-cadastros" class="tab-content hidden space-y-6">
             <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2">
                 <i class="fa-solid fa-address-book"></i> Cadastros & Equipe
@@ -138,22 +138,20 @@
                 <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-chalkboard-user text-amber-400"></i> Professores</h3>
                 <form id="professor-form" onsubmit="addProfessor(event)" class="flex gap-2">
                     <input type="text" id="prof-name" placeholder="Nome do Professor" required class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                    <!-- Dinamicamente preenchido com todas as faixas cadastradas -->
                     <select id="prof-belt" required class="bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-                        <option value="Preta">Preta</option>
-                        <option value="Marrom">Marrom</option>
-                        <option value="Roxa">Roxa</option>
-                        <option value="Azul">Azul</option>
+                        <!-- options preenchidas por JS -->
                     </select>
                     <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-2 rounded-xl text-xs"><i class="fa-solid fa-plus"></i></button>
                 </form>
                 <div id="professors-list" class="space-y-1.5 pt-2"></div>
             </div>
 
-            <!-- FAIXAS (NOVO!) -->
+            <!-- FAIXAS -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
                 <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-medal text-amber-400"></i> Faixas</h3>
                 <form id="belt-form" onsubmit="addBelt(event)" class="flex gap-2">
-                    <input type="text" id="belt-name" placeholder="Ex: Coral, Vermelha, etc." required class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                    <input type="text" id="belt-name" placeholder="Ex: Coral, Vermelha..." required class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
                     <input type="color" id="belt-color" value="#eab308" class="w-10 h-9 bg-slate-950 border border-slate-700 rounded-xl cursor-pointer p-1">
                     <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-2 rounded-xl text-xs"><i class="fa-solid fa-plus"></i></button>
                 </form>
@@ -628,6 +626,11 @@
             document.getElementById('student-modal').classList.add('hidden');
         }
 
+        // Correção: Função editStudent que faltava para abrir o modal de edição
+        function editStudent(id) {
+            openStudentModal(id);
+        }
+
         async function saveStudent(e) {
             e.preventDefault();
             const id = document.getElementById('student-id').value;
@@ -637,7 +640,11 @@
 
             if (id) {
                 const s = state.students.find(x => x.id === id);
-                s.name = name; s.category = category; s.belt = belt;
+                if (s) {
+                    s.name = name; 
+                    s.category = category; 
+                    s.belt = belt;
+                }
                 showToast('Aluno atualizado!');
             } else {
                 state.students.push({ id: 's_' + Date.now(), name, category, belt });
@@ -659,7 +666,12 @@
         }
 
         function renderCadastros() {
-            // Professores
+            // Professores - Correção: Popular o select de faixa dinamicamente com state.belts
+            const profBeltSelect = document.getElementById('prof-belt');
+            if (profBeltSelect) {
+                profBeltSelect.innerHTML = state.belts.map(b => `<option value="${b.name}">Faixa ${b.name}</option>`).join('');
+            }
+
             const profContainer = document.getElementById('professors-list');
             profContainer.innerHTML = state.professors.map(p => `
                 <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs">
