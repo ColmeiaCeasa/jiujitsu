@@ -24,10 +24,7 @@
         }
     </script>
     <style>
-        /* Custom scrollbar and touch optimizations */
-        body {
-            -webkit-tap-highlight-color: transparent;
-        }
+        body { -webkit-tap-highlight-color: transparent; }
         @media print {
             body { background: white !important; color: black !important; }
             .no-print { display: none !important; }
@@ -50,15 +47,15 @@
             </div>
             <div>
                 <h1 class="font-bold text-base leading-tight">BJJ Controle</h1>
-                <p class="text-xs text-amber-400" id="sync-status"><i class="fa-solid fa-sync fa-spin"></i> Sincronizando dados...</p>
+                <p class="text-xs text-amber-400" id="sync-status"><i class="fa-solid fa-sync fa-spin"></i> Sincronizando...</p>
             </div>
         </div>
-        <button onclick="loadDataFromSheets()" title="Atualizar Dados da Planilha" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-800 border border-slate-700">
+        <button onclick="loadDataFromSheets()" title="Atualizar Dados" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-800 border border-slate-700">
             <i class="fa-solid fa-rotate text-sm"></i>
         </button>
     </header>
 
-    <!-- Main Content Area (Scrollable) -->
+    <!-- Main Content Area -->
     <main class="flex-1 overflow-y-auto pb-24 p-4 max-w-md mx-auto w-full">
 
         <!-- TAB 1: LANÇAR AULA -->
@@ -90,7 +87,6 @@
                 </div>
             </div>
 
-            <!-- Attendance Controls & List -->
             <div class="space-y-3">
                 <div class="flex items-center justify-between px-1">
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider" id="attendance-counter">Alunos (0)</span>
@@ -101,7 +97,6 @@
                 </div>
 
                 <div id="attendance-list" class="space-y-2">
-                    <!-- Dynamic Student Check-in Cards -->
                     <div class="text-center py-8 text-slate-500 text-sm">Carregando alunos...</div>
                 </div>
 
@@ -122,7 +117,6 @@
                 </button>
             </div>
 
-            <!-- Search and Filter -->
             <div class="flex gap-2">
                 <div class="relative flex-1">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-slate-500 text-xs"></i>
@@ -130,9 +124,7 @@
                 </div>
             </div>
 
-            <div id="students-list" class="space-y-2">
-                <!-- Dynamic Students -->
-            </div>
+            <div id="students-list" class="space-y-2"></div>
         </section>
 
         <!-- TAB 3: CADASTROS (Professores, Categorias, Faixas) -->
@@ -141,11 +133,8 @@
                 <i class="fa-solid fa-address-book"></i> Cadastros & Equipe
             </h2>
 
-            <!-- Professors Management -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-chalkboard-user text-amber-400"></i> Professores</h3>
-                </div>
+                <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-chalkboard-user text-amber-400"></i> Professores</h3>
                 <form id="professor-form" onsubmit="addProfessor(event)" class="flex gap-2">
                     <input type="text" id="prof-name" placeholder="Nome do Professor" required class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
                     <select id="prof-belt" required class="bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
@@ -159,29 +148,13 @@
                 <div id="professors-list" class="space-y-1.5 pt-2"></div>
             </div>
 
-            <!-- Categories Management -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-tags text-amber-400"></i> Categorias</h3>
-                </div>
+                <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-tags text-amber-400"></i> Categorias</h3>
                 <form id="category-form" onsubmit="addCategory(event)" class="flex gap-2">
-                    <input type="text" id="cat-name" placeholder="Ex: Adulto, Infantil, Master" required class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                    <input type="text" id="cat-name" placeholder="Ex: Adulto, Infantil" required class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
                     <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-2 rounded-xl text-xs"><i class="fa-solid fa-plus"></i></button>
                 </form>
                 <div id="categories-list" class="flex flex-wrap gap-1.5 pt-2"></div>
-            </div>
-
-            <!-- Belts Management -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-medal text-amber-400"></i> Faixas</h3>
-                </div>
-                <form id="belt-form" onsubmit="addBelt(event)" class="flex gap-2">
-                    <input type="text" id="belt-name" placeholder="Ex: Branca, Azul, Roxa" required class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-                    <input type="color" id="belt-color" value="#ffffff" class="w-10 h-9 bg-slate-950 border border-slate-700 rounded-xl cursor-pointer p-1">
-                    <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-2 rounded-xl text-xs"><i class="fa-solid fa-plus"></i></button>
-                </form>
-                <div id="belts-list" class="space-y-1.5 pt-2"></div>
             </div>
         </section>
 
@@ -215,7 +188,6 @@
                 </div>
             </div>
 
-            <!-- Report Output Area -->
             <div id="report-output" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3 print-container">
                 <div class="text-center py-6 text-slate-500 text-xs">Selecione os filtros acima para gerar o relatório.</div>
             </div>
@@ -223,7 +195,7 @@
 
     </main>
 
-    <!-- Student Modal (Add/Edit) -->
+    <!-- Student Modal -->
     <div id="student-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
@@ -238,14 +210,20 @@
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-400 mb-1">Categoria</label>
-                    <select id="student-category" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
-                        <!-- options -->
-                    </select>
+                    <select id="student-category" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500"></select>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-400 mb-1">Faixa</label>
                     <select id="student-belt" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
-                        <!-- options -->
+                        <option value="Branca">Branca</option>
+                        <option value="Cinza">Cinza</option>
+                        <option value="Amarela">Amarela</option>
+                        <option value="Laranja">Laranja</option>
+                        <option value="Verde">Verde</option>
+                        <option value="Azul">Azul</option>
+                        <option value="Roxa">Roxa</option>
+                        <option value="Marrom">Marrom</option>
+                        <option value="Preta">Preta</option>
                     </select>
                 </div>
                 <div class="flex gap-2 pt-2">
@@ -256,7 +234,7 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar (Mobile Optimized) -->
+    <!-- Bottom Navigation -->
     <nav class="bg-slate-900 border-t border-slate-800 fixed bottom-0 left-0 right-0 z-40 no-print max-w-md mx-auto flex justify-around py-2 px-1 shadow-2xl">
         <button onclick="switchTab('lancar')" id="nav-lancar" class="flex flex-col items-center justify-center flex-1 py-1 text-amber-400 transition">
             <i class="fa-solid fa-clipboard-user text-base mb-0.5"></i>
@@ -280,88 +258,68 @@
         // =========================================================================
         // INSIRA A SUA URL DO GOOGLE APPS SCRIPT NA LINHA ABAIXO:
         // =========================================================================
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxgmvVw11IScg46FqEyzGf1mEkk6qeokTHKnuFa4hhIsUgjALocg388PJM9QLcq-Tk/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZYmxdbOcjDFwdenIbjyLMz2Ww9I5ciFfENroQP8gyJ2rPgTdzRcKyzIzrwuxgWpQU/exec';
 
-        // --- State Management ---
         let state = {
-            students: JSON.parse(localStorage.getItem('bjj_students')) || [
-                { id: '1', name: 'Carlos Silva', category: 'Adulto', belt: 'Azul' },
-                { id: '2', name: 'Mariana Souza', category: 'Adulto', belt: 'Roxa' },
-                { id: '3', name: 'João Pedro', category: 'Infantil', belt: 'Cinza' }
-            ],
-            professors: JSON.parse(localStorage.getItem('bjj_professors')) || [
-                { id: '1', name: 'Mestre Roberto', belt: 'Preta' },
-                { id: '2', name: 'Professor André', belt: 'Marrom' }
-            ],
-            categories: JSON.parse(localStorage.getItem('bjj_categories')) || ['Infantil', 'Juvenil', 'Adulto', 'Master'],
-            belts: JSON.parse(localStorage.getItem('bjj_belts')) || [
-                { name: 'Branca', color: '#ffffff' },
-                { name: 'Cinza', color: '#94a3b8' },
-                { name: 'Amarela', color: '#eab308' },
-                { name: 'Laranja', color: '#f97316' },
-                { name: 'Verde', color: '#22c55e' },
-                { name: 'Azul', color: '#3b82f6' },
-                { name: 'Roxa', color: '#a855f7' },
-                { name: 'Marrom', color: '#78350f' },
-                { name: 'Preta', color: '#0f172a' }
-            ],
-            attendanceLogs: JSON.parse(localStorage.getItem('bjj_attendance')) || []
+            students: [],
+            professors: [],
+            categories: ['Infantil', 'Juvenil', 'Adulto', 'Master'],
+            attendanceLogs: []
         };
 
-        // Save state to localStorage
-        function persist() {
+        function persistLocally() {
             localStorage.setItem('bjj_students', JSON.stringify(state.students));
             localStorage.setItem('bjj_professors', JSON.stringify(state.professors));
             localStorage.setItem('bjj_categories', JSON.stringify(state.categories));
-            localStorage.setItem('bjj_belts', JSON.stringify(state.belts));
             localStorage.setItem('bjj_attendance', JSON.stringify(state.attendanceLogs));
         }
 
-        // FUNÇÃO ADICIONADA: Busca histórico de frequências direto do Sheets ao abrir
         async function loadDataFromSheets() {
             const statusEl = document.getElementById('sync-status');
             if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('SUA_URL_AQUI')) {
-                if (statusEl) statusEl.innerHTML = `<span class="text-amber-400"><i class="fa-solid fa-triangle-exclamation"></i> Configure a URL do Apps Script</span>`;
+                if (statusEl) statusEl.innerHTML = `<span class="text-amber-400"><i class="fa-solid fa-triangle-exclamation"></i> Configure a URL</span>`;
                 return;
             }
 
-            if (statusEl) statusEl.innerHTML = `<span class="text-amber-400"><i class="fa-solid fa-sync fa-spin"></i> Baixando dados...</span>`;
+            if (statusEl) statusEl.innerHTML = `<span class="text-amber-400"><i class="fa-solid fa-sync fa-spin"></i> Sincronizando...</span>`;
 
             try {
                 const response = await fetch(APPS_SCRIPT_URL);
                 const data = await response.json();
 
-                if (data && data.logs && Array.isArray(data.logs)) {
-                    // Mapeia logs puxados da planilha para a estrutura do app
-                    const mappedLogs = data.logs.map(l => {
-                        let matchedStudent = state.students.find(s => s.name === l.studentName);
-                        return {
-                            id: l.id || ('att_' + Date.now()),
-                            date: l.date,
-                            professor: l.professor,
-                            studentId: matchedStudent ? matchedStudent.id : ('s_' + l.studentName),
-                            studentName: l.studentName,
-                            category: l.category,
-                            belt: l.belt,
-                            status: l.status || 'Presente'
-                        };
-                    });
-
-                    state.attendanceLogs = mappedLogs;
-                    persist();
-
-                    if (statusEl) statusEl.innerHTML = `<span class="text-emerald-400"><i class="fa-solid fa-cloud"></i> Sincronizado com Google Sheets</span>`;
+                if (data) {
+                    if (data.students && data.students.length > 0) state.students = data.students;
+                    if (data.professors && data.professors.length > 0) state.professors = data.professors;
+                    if (data.logs) state.attendanceLogs = data.logs;
                     
-                    // Atualiza a visualização do relatório se estiver aberto
-                    generateReport();
+                    persistLocally();
+                    if (statusEl) statusEl.innerHTML = `<span class="text-emerald-400"><i class="fa-solid fa-cloud"></i> Sincronizado na Nuvem</span>`;
                 }
             } catch (err) {
-                console.error("Erro ao puxar dados da planilha:", err);
-                if (statusEl) statusEl.innerHTML = `<span class="text-slate-400"><i class="fa-solid fa-database"></i> Usando dados locais (Offline)</span>`;
+                console.error("Erro ao sincronizar:", err);
+                // Fallback para dados locais se offline
+                state.students = JSON.parse(localStorage.getItem('bjj_students')) || state.students;
+                state.professors = JSON.parse(localStorage.getItem('bjj_professors')) || state.professors;
+                state.attendanceLogs = JSON.parse(localStorage.getItem('bjj_attendance')) || [];
+                if (statusEl) statusEl.innerHTML = `<span class="text-slate-400"><i class="fa-solid fa-database"></i> Modo Offline</span>`;
+            }
+            initLancarTab();
+        }
+
+        async function syncTableToSheets(actionName, payloadData) {
+            if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('SUA_URL_AQUI')) return;
+            try {
+                await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: actionName, payload: payloadData })
+                });
+            } catch (e) {
+                console.error("Erro ao enviar para planilha:", e);
             }
         }
 
-        // --- Toast Notifications ---
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -376,7 +334,6 @@
             }, 3000);
         }
 
-        // --- Navigation ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
@@ -393,26 +350,22 @@
 
             window.scrollTo(0, 0);
 
-            // Trigger specific tab initializers
             if (tabId === 'lancar') initLancarTab();
             if (tabId === 'alunos') renderStudentsList();
             if (tabId === 'cadastros') renderCadastros();
             if (tabId === 'relatorios') initReportTab();
         }
 
-        // --- Tab 1: Lançar Aula ---
         function initLancarTab() {
             const dateInput = document.getElementById('class-date');
             if (!dateInput.value) {
                 dateInput.valueAsDate = new Date();
             }
 
-            // Populate Professors dropdown
             const profSelect = document.getElementById('class-professor');
             profSelect.innerHTML = '<option value="">Selecione o Professor...</option>' + 
                 state.professors.map(p => `<option value="${p.name}">${p.name} (${p.belt})</option>`).join('');
 
-            // Populate Category filter
             const catSelect = document.getElementById('class-filter-category');
             catSelect.innerHTML = '<option value="">Todas as Categorias</option>' + 
                 state.categories.map(c => `<option value="${c}">${c}</option>`).join('');
@@ -420,7 +373,7 @@
             renderAttendanceList();
         }
 
-        let currentAttendanceMap = {}; // studentId -> boolean
+        let currentAttendanceMap = {};
 
         function renderAttendanceList() {
             const filterCat = document.getElementById('class-filter-category').value;
@@ -435,15 +388,13 @@
             }
 
             container.innerHTML = filteredStudents.map(s => {
-                const isPresent = currentAttendanceMap[s.id] !== undefined ? currentAttendanceMap[s.id] : true; // Default to present
+                const isPresent = currentAttendanceMap[s.id] !== undefined ? currentAttendanceMap[s.id] : true;
                 currentAttendanceMap[s.id] = isPresent;
-                const beltObj = state.belts.find(b => b.name === s.belt);
-                const beltColor = beltObj ? beltObj.color : '#ffffff';
 
                 return `
-                    <div onclick="toggleStudentAttendance('${s.id}')" id="card-${s.id}" class="flex items-center justify-between p-3 rounded-2xl border transition cursor-pointer select-none ${isPresent ? 'bg-slate-900 border-emerald-500/50 shadow-emerald-950/20 shadow-md' : 'bg-slate-900/50 border-slate-800 opacity-60'}">
+                    <div onclick="toggleStudentAttendance('${s.id}')" id="card-${s.id}" class="flex items-center justify-between p-3 rounded-2xl border transition cursor-pointer select-none ${isPresent ? 'bg-slate-900 border-emerald-500/50 shadow-md' : 'bg-slate-900/50 border-slate-800 opacity-60'}">
                         <div class="flex items-center gap-3">
-                            <div class="w-3 h-10 rounded-full" style="background-color: ${beltColor};"></div>
+                            <div class="w-3 h-10 rounded-full bg-amber-500"></div>
                             <div>
                                 <h4 class="font-bold text-sm text-slate-100">${s.name}</h4>
                                 <p class="text-[10px] text-slate-400">${s.category} • Faixa ${s.belt}</p>
@@ -463,7 +414,7 @@
             const isPresent = currentAttendanceMap[studentId];
             
             if (isPresent) {
-                card.className = "flex items-center justify-between p-3 rounded-2xl border transition cursor-pointer select-none bg-slate-900 border-emerald-500/50 shadow-emerald-950/20 shadow-md";
+                card.className = "flex items-center justify-between p-3 rounded-2xl border transition cursor-pointer select-none bg-slate-900 border-emerald-500/50 shadow-md";
                 card.querySelector('div:last-child').className = "w-8 h-8 rounded-xl flex items-center justify-center transition bg-emerald-500 text-slate-950";
                 card.querySelector('div:last-child i').className = "fa-solid fa-check text-sm";
             } else {
@@ -476,9 +427,7 @@
         function markAllAttendance(status) {
             const filterCat = document.getElementById('class-filter-category').value;
             const filteredStudents = state.students.filter(s => !filterCat || s.category === filterCat);
-            filteredStudents.forEach(s => {
-                currentAttendanceMap[s.id] = status;
-            });
+            filteredStudents.forEach(s => { currentAttendanceMap[s.id] = status; });
             renderAttendanceList();
         }
 
@@ -487,12 +436,12 @@
             const professor = document.getElementById('class-professor').value;
 
             if (!date || !professor) {
-                showToast('Preencha a data e selecione o professor responsável.', 'warning');
+                showToast('Preencha a data e selecione o professor.', 'warning');
                 return;
             }
 
             if (state.students.length === 0) {
-                showToast('Cadastre alunos antes de lançar frequência.', 'warning');
+                showToast('Cadastre alunos antes.', 'warning');
                 return;
             }
 
@@ -509,72 +458,48 @@
             }));
 
             state.attendanceLogs.push(...logEntries);
-            persist();
-            showToast('Frequência salva no dispositivo!');
+            persistLocally();
+            showToast('Salvando na planilha...', 'info');
 
-            // Envio automático para o Google Sheets via Apps Script
-            if (APPS_SCRIPT_URL && !APPS_SCRIPT_URL.includes('SUA_URL_AQUI')) {
-                showToast('Enviando para a planilha...', 'info');
-                try {
-                    for (let entry of logEntries) {
-                        await fetch(APPS_SCRIPT_URL, {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ action: 'Frequencia', ...entry })
-                        });
-                    }
-                    showToast('Lançamento salvo com sucesso no Google Sheets!');
-                } catch (e) {
-                    console.error('Erro de envio:', e);
-                    showToast('Erro ao sincronizar com Google Sheets.', 'error');
-                }
-            } else {
-                showToast('Aviso: Substitua a constante APPS_SCRIPT_URL no código para enviar para o Google Sheets.', 'warning');
+            for (let entry of logEntries) {
+                await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'Frequencia', ...entry })
+                });
             }
+            showToast('Frequência salva com sucesso!');
         }
 
-        // --- Tab 2: Alunos ---
         function renderStudentsList() {
             const search = document.getElementById('student-search').value.toLowerCase();
             const container = document.getElementById('students-list');
-
-            const filtered = state.students.filter(s => s.name.toLowerCase().includes(search) || s.category.toLowerCase().includes(search) || s.belt.toLowerCase().includes(search));
+            const filtered = state.students.filter(s => s.name.toLowerCase().includes(search) || s.category.toLowerCase().includes(search));
 
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="text-center py-8 text-slate-500 text-xs">Nenhum aluno encontrado.</div>`;
                 return;
             }
 
-            container.innerHTML = filtered.map(s => {
-                const beltObj = state.belts.find(b => b.name === s.belt);
-                const beltColor = beltObj ? beltObj.color : '#ffffff';
-
-                return `
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between shadow">
-                        <div class="flex items-center gap-3">
-                            <div class="w-3 h-10 rounded-full" style="background-color: ${beltColor};"></div>
-                            <div>
-                                <h4 class="font-bold text-sm text-slate-100">${s.name}</h4>
-                                <p class="text-[10px] text-slate-400">${s.category} • Faixa ${s.belt}</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-1">
-                            <button onclick="editStudent('${s.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-xl text-xs"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteStudent('${s.id}')" class="bg-slate-800 hover:bg-slate-700 text-rose-400 p-2 rounded-xl text-xs"><i class="fa-solid fa-trash"></i></button>
-                        </div>
+            container.innerHTML = filtered.map(s => `
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between shadow">
+                    <div>
+                        <h4 class="font-bold text-sm text-slate-100">${s.name}</h4>
+                        <p class="text-[10px] text-slate-400">${s.category} • Faixa ${s.belt}</p>
                     </div>
-                `;
-            }).join('');
+                    <div class="flex gap-1">
+                        <button onclick="editStudent('${s.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-xl text-xs"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteStudent('${s.id}')" class="bg-slate-800 hover:bg-slate-700 text-rose-400 p-2 rounded-xl text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function openStudentModal(studentId = null) {
             const modal = document.getElementById('student-modal');
             const catSelect = document.getElementById('student-category');
-            const beltSelect = document.getElementById('student-belt');
-
             catSelect.innerHTML = state.categories.map(c => `<option value="${c}">${c}</option>`).join('');
-            beltSelect.innerHTML = state.belts.map(b => `<option value="${b.name}">Faixa ${b.name}</option>`).join('');
 
             if (studentId) {
                 document.getElementById('modal-title').innerText = 'Editar Aluno';
@@ -588,7 +513,6 @@
                 document.getElementById('student-form').reset();
                 document.getElementById('student-id').value = '';
             }
-
             modal.classList.remove('hidden');
         }
 
@@ -596,7 +520,7 @@
             document.getElementById('student-modal').classList.add('hidden');
         }
 
-        function saveStudent(e) {
+        async function saveStudent(e) {
             e.preventDefault();
             const id = document.getElementById('student-id').value;
             const name = document.getElementById('student-name').value;
@@ -605,88 +529,71 @@
 
             if (id) {
                 const s = state.students.find(x => x.id === id);
-                s.name = name;
-                s.category = category;
-                s.belt = belt;
-                showToast('Aluno atualizado com sucesso!');
+                s.name = name; s.category = category; s.belt = belt;
+                showToast('Aluno atualizado!');
             } else {
                 state.students.push({ id: 's_' + Date.now(), name, category, belt });
-                showToast('Aluno cadastrado com sucesso!');
+                showToast('Aluno cadastrado!');
             }
 
-            persist();
+            persistLocally();
             closeStudentModal();
             renderStudentsList();
+            await syncTableToSheets('Alunos', state.students);
         }
 
-        function editStudent(id) {
-            openStudentModal(id);
-        }
-
-        function deleteStudent(id) {
+        async function deleteStudent(id) {
             state.students = state.students.filter(s => s.id !== id);
-            persist();
+            persistLocally();
             renderStudentsList();
             showToast('Aluno removido.');
+            await syncTableToSheets('Alunos', state.students);
         }
 
-        // --- Tab 3: Cadastros ---
         function renderCadastros() {
-            // Professors
             const profContainer = document.getElementById('professors-list');
             profContainer.innerHTML = state.professors.map(p => `
                 <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs">
                     <div><span class="font-bold text-slate-200">${p.name}</span> <span class="text-slate-400">(Faixa ${p.belt})</span></div>
                     <button onclick="deleteProfessor('${p.id}')" class="text-rose-400 hover:text-rose-300 p-1"><i class="fa-solid fa-trash"></i></button>
                 </div>
-            `).join('') || '<div class="text-slate-500 text-xs text-center py-2">Nenhum professor cadastrado.</div>';
+            `).join('') || '<div class="text-slate-500 text-xs text-center py-2">Nenhum professor.</div>';
 
-            // Categories
             const catContainer = document.getElementById('categories-list');
             catContainer.innerHTML = state.categories.map(c => `
                 <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-xl text-xs text-slate-200">
                     <span>${c}</span>
                     <button onclick="deleteCategory('${c}')" class="text-rose-400 hover:text-rose-300 ml-1"><i class="fa-solid fa-xmark"></i></button>
                 </div>
-            `).join('') || '<div class="text-slate-500 text-xs">Nenhuma categoria.</div>';
-
-            // Belts
-            const beltContainer = document.getElementById('belts-list');
-            beltContainer.innerHTML = state.belts.map(b => `
-                <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs">
-                    <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded-full border border-slate-700" style="background-color: ${b.color};"></div>
-                        <span class="font-bold text-slate-200">Faixa ${b.name}</span>
-                    </div>
-                    <button onclick="deleteBelt('${b.name}')" class="text-rose-400 hover:text-rose-300 p-1"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `).join('') || '<div class="text-slate-500 text-xs text-center py-2">Nenhuma faixa cadastrada.</div>';
+            `).join('');
         }
 
-        function addProfessor(e) {
+        async function addProfessor(e) {
             e.preventDefault();
             const name = document.getElementById('prof-name').value;
             const belt = document.getElementById('prof-belt').value;
             state.professors.push({ id: 'p_' + Date.now(), name, belt });
-            persist();
+            persistLocally();
             document.getElementById('professor-form').reset();
             renderCadastros();
             showToast('Professor cadastrado!');
+            await syncTableToSheets('Professores', state.professors);
         }
 
-        function deleteProfessor(id) {
+        async function deleteProfessor(id) {
             state.professors = state.professors.filter(p => p.id !== id);
-            persist();
+            persistLocally();
             renderCadastros();
             showToast('Professor removido.');
+            await syncTableToSheets('Professores', state.professors);
         }
 
-        function addCategory(e) {
+        async function addCategory(e) {
             e.preventDefault();
             const name = document.getElementById('cat-name').value;
             if (!state.categories.includes(name)) {
                 state.categories.push(name);
-                persist();
+                persistLocally();
                 document.getElementById('category-form').reset();
                 renderCadastros();
                 showToast('Categoria adicionada!');
@@ -695,39 +602,17 @@
 
         function deleteCategory(name) {
             state.categories = state.categories.filter(c => c !== name);
-            persist();
+            persistLocally();
             renderCadastros();
             showToast('Categoria removida.');
         }
 
-        function addBelt(e) {
-            e.preventDefault();
-            const name = document.getElementById('belt-name').value;
-            const color = document.getElementById('belt-color').value;
-            if (!state.belts.find(b => b.name === name)) {
-                state.belts.push({ name, color });
-                persist();
-                document.getElementById('belt-form').reset();
-                renderCadastros();
-                showToast('Faixa adicionada!');
-            }
-        }
-
-        function deleteBelt(name) {
-            state.belts = state.belts.filter(b => b.name !== name);
-            persist();
-            renderCadastros();
-            showToast('Faixa removida.');
-        }
-
-        // --- Tab 4: Relatórios ---
         function initReportTab() {
             const startInput = document.getElementById('report-start');
             const endInput = document.getElementById('report-end');
-            
             if (!startInput.value) {
                 const d = new Date();
-                d.setDate(1); // First day of month
+                d.setDate(1);
                 startInput.valueAsDate = d;
                 endInput.valueAsDate = new Date();
             }
@@ -735,7 +620,6 @@
             const studentSelect = document.getElementById('report-student');
             studentSelect.innerHTML = '<option value="">Todos os Alunos</option>' + 
                 state.students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-
             generateReport();
         }
 
@@ -751,38 +635,29 @@
             if (studentId) logs = logs.filter(l => l.studentId === studentId);
 
             if (logs.length === 0) {
-                output.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs">Nenhum registro encontrado para o período/filtro selecionado.</div>`;
+                output.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs">Nenhum registro encontrado.</div>`;
                 return;
             }
 
-            // Group by student summary
             let summary = {};
-            
-            // Adiciona primeiro os alunos cadastrados
             state.students.forEach(s => {
                 if (!studentId || s.id === studentId) {
-                    summary[s.id] = { name: s.name, category: s.category, belt: s.belt, present: 0, totalClasses: 0 };
+                    summary[s.id] = { name: s.name, category: s.category, belt: s.belt, present: 0 };
                 }
             });
 
-            // Adiciona presenças trazidas do Google Sheets
             logs.forEach(l => {
                 if (!summary[l.studentId]) {
-                    summary[l.studentId] = { name: l.studentName, category: l.category, belt: l.belt, present: 0, totalClasses: 0 };
+                    summary[l.studentId] = { name: l.studentName, category: l.category, belt: l.belt, present: 0 };
                 }
-                summary[l.studentId].totalClasses++;
                 if (l.status === 'Presente') {
                     summary[l.studentId].present++;
                 }
             });
 
             output.innerHTML = `
-                <div class="print-only text-slate-900 mb-4 pb-2 border-b border-slate-300">
-                    <h2 class="text-lg font-bold">Relatório de Frequência - Jiu-Jitsu</h2>
-                    <p class="text-xs">Período: ${startDate || 'Início'} até ${endDate || 'Hoje'}</p>
-                </div>
                 <div class="space-y-3">
-                    <h3 class="font-bold text-xs text-amber-400 no-print uppercase tracking-wider">Resumo de Presença</h3>
+                    <h3 class="font-bold text-xs text-amber-400 uppercase tracking-wider">Resumo de Presença</h3>
                     <div class="divide-y divide-slate-800 space-y-2">
                         ${Object.values(summary).map(st => `
                             <div class="pt-2 flex items-center justify-between text-xs">
@@ -800,14 +675,10 @@
             `;
         }
 
-        function printReport() {
-            window.print();
-        }
+        function printReport() { window.print(); }
 
-        // Initialize App on Load
         window.onload = function() {
             switchTab('lancar');
-            // Carrega os dados salvos da planilha automaticamente ao abrir
             loadDataFromSheets();
         };
     </script>
