@@ -15,9 +15,9 @@
                     colors: {
                         jjdark: '#0f172a',
                         jjcard: '#1e293b',
-                        jjaccent: '#f59e0b', // Amber
-                        jjgreen: '#10b981',  // Emerald
-                        jjred: '#ef4444'     // Red
+                        jjaccent: '#f59e0b',
+                        jjgreen: '#10b981',
+                        jjred: '#ef4444'
                     }
                 }
             }
@@ -36,7 +36,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 h-full flex flex-col font-sans">
 
-    <!-- Toast Notification Container -->
+    <!-- Toast Container -->
     <div id="toast-container" class="fixed top-4 left-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Top Header -->
@@ -55,7 +55,7 @@
         </button>
     </header>
 
-    <!-- Main Content Area -->
+    <!-- Main Content -->
     <main class="flex-1 overflow-y-auto pb-24 p-4 max-w-md mx-auto w-full">
 
         <!-- TAB 1: LANÇAR AULA -->
@@ -127,7 +127,7 @@
             <div id="students-list" class="space-y-2"></div>
         </section>
 
-        <!-- TAB 3: CADASTROS (Professores, Categorias, Faixas) -->
+        <!-- TAB 3: CADASTROS -->
         <section id="tab-cadastros" class="tab-content hidden space-y-6">
             <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2">
                 <i class="fa-solid fa-address-book"></i> Cadastros & Equipe
@@ -158,7 +158,24 @@
             </div>
         </section>
 
-        <!-- TAB 4: RELATÓRIOS -->
+        <!-- TAB 4: GERENCIAR LANÇAMENTOS (NOVA ABA DE EDIÇÃO/EXCLUSÃO) -->
+        <section id="tab-gerenciar" class="tab-content hidden space-y-4">
+            <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square"></i> Gerenciar Lançamentos
+            </h2>
+            <p class="text-xs text-slate-400">Aqui você pode visualizar aulas passadas e excluir registros errados da planilha.</p>
+
+            <div class="flex gap-2">
+                <input type="date" id="filter-log-date" onchange="renderManageLogs()" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 flex-1 focus:outline-none focus:border-amber-500">
+                <button onclick="document.getElementById('filter-log-date').value=''; renderManageLogs();" class="bg-slate-800 text-slate-300 px-3 py-2 rounded-xl text-xs border border-slate-700">Limpar Data</button>
+            </div>
+
+            <div id="manage-logs-list" class="space-y-2">
+                <!-- Dynamic Logs -->
+            </div>
+        </section>
+
+        <!-- TAB 5: RELATÓRIOS -->
         <section id="tab-relatorios" class="tab-content hidden space-y-4">
             <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2">
                 <i class="fa-solid fa-chart-bar"></i> Relatórios de Frequência
@@ -234,23 +251,27 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (Mobile Optimized with 5 options) -->
     <nav class="bg-slate-900 border-t border-slate-800 fixed bottom-0 left-0 right-0 z-40 no-print max-w-md mx-auto flex justify-around py-2 px-1 shadow-2xl">
         <button onclick="switchTab('lancar')" id="nav-lancar" class="flex flex-col items-center justify-center flex-1 py-1 text-amber-400 transition">
-            <i class="fa-solid fa-clipboard-user text-base mb-0.5"></i>
-            <span class="text-[10px] font-medium">Lançar</span>
+            <i class="fa-solid fa-clipboard-user text-sm mb-0.5"></i>
+            <span class="text-[9px] font-medium">Lançar</span>
         </button>
         <button onclick="switchTab('alunos')" id="nav-alunos" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-200 transition">
-            <i class="fa-solid fa-users text-base mb-0.5"></i>
-            <span class="text-[10px] font-medium">Alunos</span>
+            <i class="fa-solid fa-users text-sm mb-0.5"></i>
+            <span class="text-[9px] font-medium">Alunos</span>
         </button>
         <button onclick="switchTab('cadastros')" id="nav-cadastros" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-200 transition">
-            <i class="fa-solid fa-address-book text-base mb-0.5"></i>
-            <span class="text-[10px] font-medium">Equipe</span>
+            <i class="fa-solid fa-address-book text-sm mb-0.5"></i>
+            <span class="text-[9px] font-medium">Equipe</span>
+        </button>
+        <button onclick="switchTab('gerenciar')" id="nav-gerenciar" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-200 transition">
+            <i class="fa-solid fa-pen-to-square text-sm mb-0.5"></i>
+            <span class="text-[9px] font-medium">Editar</span>
         </button>
         <button onclick="switchTab('relatorios')" id="nav-relatorios" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-200 transition">
-            <i class="fa-solid fa-chart-bar text-base mb-0.5"></i>
-            <span class="text-[10px] font-medium">Relatórios</span>
+            <i class="fa-solid fa-chart-bar text-sm mb-0.5"></i>
+            <span class="text-[9px] font-medium">Relatórios</span>
         </button>
     </nav>
 
@@ -258,7 +279,7 @@
         // =========================================================================
         // INSIRA A SUA URL DO GOOGLE APPS SCRIPT NA LINHA ABAIXO:
         // =========================================================================
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZYmxdbOcjDFwdenIbjyLMz2Ww9I5ciFfENroQP8gyJ2rPgTdzRcKyzIzrwuxgWpQU/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwAy2jC-FgyOnKE7AdMZT_n4feFP8-9glKEQul_ht0MUdEAVcrlzK_hs6VGmKL6v3aW/exec';
 
         let state = {
             students: [],
@@ -297,7 +318,6 @@
                 }
             } catch (err) {
                 console.error("Erro ao sincronizar:", err);
-                // Fallback para dados locais se offline
                 state.students = JSON.parse(localStorage.getItem('bjj_students')) || state.students;
                 state.professors = JSON.parse(localStorage.getItem('bjj_professors')) || state.professors;
                 state.attendanceLogs = JSON.parse(localStorage.getItem('bjj_attendance')) || [];
@@ -353,6 +373,7 @@
             if (tabId === 'lancar') initLancarTab();
             if (tabId === 'alunos') renderStudentsList();
             if (tabId === 'cadastros') renderCadastros();
+            if (tabId === 'gerenciar') renderManageLogs();
             if (tabId === 'relatorios') initReportTab();
         }
 
@@ -459,7 +480,7 @@
 
             state.attendanceLogs.push(...logEntries);
             persistLocally();
-            showToast('Salvando na planilha...', 'info');
+            showToast('Enviando para a planilha...', 'info');
 
             for (let entry of logEntries) {
                 await fetch(APPS_SCRIPT_URL, {
@@ -470,6 +491,79 @@
                 });
             }
             showToast('Frequência salva com sucesso!');
+        }
+
+        // --- GERENCIAR / EXCLUIR LANÇAMENTOS ---
+        function renderManageLogs() {
+            const filterDate = document.getElementById('filter-log-date').value;
+            const container = document.getElementById('manage-logs-list');
+
+            // Agrupar logs por ID de chamada (cada chamada tem um ID único e agrupa vários alunos)
+            let uniqueClassesMap = {};
+            state.attendanceLogs.forEach(l => {
+                if (!uniqueClassesMap[l.id]) {
+                    uniqueClassesMap[l.id] = {
+                        id: l.id,
+                        date: l.date,
+                        professor: l.professor,
+                        totalPresentes: 0,
+                        totalAlunos: 0
+                    };
+                }
+                uniqueClassesMap[l.id].totalAlunos++;
+                if (l.status === 'Presente') uniqueClassesMap[l.id].totalPresentes++;
+            });
+
+            let classesList = Object.values(uniqueClassesMap);
+            if (filterDate) {
+                classesList = classesList.filter(c => c.date === filterDate);
+            }
+            // Ordenar por data mais recente
+            classesList.sort((a, b) => b.date.localeCompare(a.date));
+
+            if (classesList.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-500 text-xs">Nenhum lançamento encontrado.</div>`;
+                return;
+            }
+
+            container.innerHTML = classesList.map(c => `
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 flex items-center justify-between shadow">
+                    <div>
+                        <h4 class="font-bold text-sm text-slate-100"><i class="fa-solid fa-calendar-day text-amber-400 mr-1"></i> ${c.date.split('-').reverse().join('/')}</h4>
+                        <p class="text-xs text-slate-400 mt-0.5">Prof: <b>${c.professor}</b></p>
+                        <p class="text-[10px] text-emerald-400 mt-0.5">${c.totalPresentes} presentes de ${c.totalAlunos} alunos</p>
+                    </div>
+                    <div>
+                        <button onclick="deleteAttendanceGroup('${c.id}')" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 p-2.5 rounded-xl text-xs border border-rose-500/30 flex items-center gap-1">
+                            <i class="fa-solid fa-trash"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function deleteAttendanceGroup(attendanceId) {
+            if (!confirm('Tem certeza que deseja excluir este lançamento de frequência de todos os alunos?')) return;
+
+            // Remove localmente
+            state.attendanceLogs = state.attendanceLogs.filter(l => l.id !== attendanceId);
+            persistLocally();
+            renderManageLogs();
+            showToast('Lançamento excluído!');
+
+            // Envia comando para o Google Sheets excluir as linhas correspondentes
+            if (APPS_SCRIPT_URL && !APPS_SCRIPT_URL.includes('SUA_URL_AQUI')) {
+                try {
+                    await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'DeletarFrequencia', id: attendanceId })
+                    });
+                } catch (e) {
+                    console.error('Erro ao deletar na planilha:', e);
+                }
+            }
         }
 
         function renderStudentsList() {
