@@ -809,25 +809,28 @@
             });
 
             logs.forEach(l => {
-                if (!summary[l.studentId]) {
-                    summary[l.studentId] = { name: l.studentName, category: l.category, belt: l.belt, present: 0, absent: 0 };
+                // Se o aluno do log não estiver mais na lista de alunos cadastrados, cria um registro temporário usando o nome que veio do log
+                let sId = l.studentId || ('s_' + l.studentName);
+                if (!summary[sId]) {
+                    summary[sId] = { name: l.studentName, category: l.category || 'Geral', belt: l.belt || 'Branca', present: 0, absent: 0 };
                 }
                 if (l.status === 'Presente') {
-                    summary[l.studentId].present++;
+                    summary[sId].present++;
                 } else {
-                    summary[l.studentId].absent++;
+                    summary[sId].absent++;
                 }
             });
 
             let rowsHtml = Object.values(summary).map(st => {
                 let totalRegistrados = st.present + st.absent;
+                if (totalRegistrados === 0) return '';
                 let percentual = totalRegistrados > 0 ? ((st.present / totalRegistrados) * 100).toFixed(1) : '0.0';
                 
                 return `
                     <tr>
                         <td style="padding: 10px; border-bottom: 1px solid #334155;">
-                            <div style="font-weight: bold; color: #f8fafc;">${st.name}</div>
-                            <div style="font-size: 10px; color: #94a3b8;">${st.category} • Faixa ${st.belt}</div>
+                            <div style="font-weight: bold; color: #ffffff !important; font-size: 13px;">${st.name}</div>
+                            <div style="font-size: 11px; color: #cbd5e1 !important;">${st.category} • Faixa ${st.belt}</div>
                         </td>
                         <td style="padding: 10px; border-bottom: 1px solid #334155; text-align: center; color: #34d399; font-weight: bold;">
                             ${st.present}
@@ -851,10 +854,10 @@
                     <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
                         <thead>
                             <tr style="border-bottom: 2px solid #475569; text-align: left; color: #94a3b8;">
-                                <th style="padding: 8px;">Aluno</th>
-                                <th style="padding: 8px; text-align: center;">Presenças</th>
-                                <th style="padding: 8px; text-align: center;">Faltas</th>
-                                <th style="padding: 8px; text-align: right;">% Freq.</th>
+                                <th style="padding: 8px; color: #cbd5e1;">Aluno</th>
+                                <th style="padding: 8px; text-align: center; color: #cbd5e1;">Presenças</th>
+                                <th style="padding: 8px; text-align: center; color: #cbd5e1;">Faltas</th>
+                                <th style="padding: 8px; text-align: right; color: #cbd5e1;">% Freq.</th>
                             </tr>
                         </thead>
                         <tbody>
