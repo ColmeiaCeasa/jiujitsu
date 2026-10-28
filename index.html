@@ -50,11 +50,11 @@
             </div>
             <div>
                 <h1 class="font-bold text-base leading-tight">BJJ Controle</h1>
-                <p class="text-xs text-slate-400" id="sync-status">Modo Local (Offline)</p>
+                <p class="text-xs text-amber-400" id="sync-status"><i class="fa-solid fa-sync fa-spin"></i> Sincronizando dados...</p>
             </div>
         </div>
-        <button onclick="switchTab('config')" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-800 border border-slate-700">
-            <i class="fa-solid fa-gear text-sm"></i>
+        <button onclick="loadDataFromSheets()" title="Atualizar Dados da Planilha" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-800 border border-slate-700">
+            <i class="fa-solid fa-rotate text-sm"></i>
         </button>
     </header>
 
@@ -221,81 +221,6 @@
             </div>
         </section>
 
-        <!-- TAB 5: CONFIGURAÇÕES & SYNC -->
-        <section id="tab-config" class="tab-content hidden space-y-4">
-            <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-cloud"></i> Google Sheets & Sync
-            </h2>
-
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
-                <p class="text-xs text-slate-300 leading-relaxed">
-                    Você pode conectar este aplicativo a uma planilha do Google Sheets através de um Web App do Google Apps Script para salvar todas as frequências na nuvem.
-                </p>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">URL do Web App (Google Apps Script)</label>
-                    <input type="url" id="sheets-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-                </div>
-
-                <div class="flex gap-2 pt-1">
-                    <button onclick="saveSheetsConfig()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow">
-                        <i class="fa-solid fa-check"></i> Salvar Conexão
-                    </button>
-                    <button onclick="syncNow()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 px-3 rounded-xl border border-slate-700 text-xs flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-rotate"></i> Sincronizar
-                    </button>
-                </div>
-            </div>
-
-            <!-- Apps Script Instructions Accordion / Card -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
-                <h3 class="font-bold text-xs text-amber-400 uppercase tracking-wider">Como configurar o Google Sheets:</h3>
-                <ol class="text-xs text-slate-300 space-y-2 list-decimal pl-4">
-                    <li>Crie uma nova planilha no Google Sheets com 3 abas: <code class="bg-slate-950 px-1 py-0.5 rounded text-amber-300">Alunos</code>, <code class="bg-slate-950 px-1 py-0.5 rounded text-amber-300">Professores</code> e <code class="bg-slate-950 px-1 py-0.5 rounded text-amber-300">Frequencia</code>.</li>
-                    <li>Vá em <b>Extensões > Apps Script</b> e cole o script abaixo.</li>
-                    <li>Clique em <b>Implantar > Nova implantação</b> (Tipo: Aplicativo da Web, Acesso: Qualquer pessoa).</li>
-                    <li>Copie a URL gerada e cole no campo acima.</li>
-                </ol>
-
-                <div class="relative pt-2">
-                    <button onclick="copyAppsScriptCode()" class="absolute top-4 right-2 bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-lg text-[10px] border border-slate-700 flex items-center gap-1">
-                        <i class="fa-solid fa-copy"></i> Copiar Código
-                    </button>
-                    <pre class="bg-slate-950 p-3 rounded-xl text-[10px] text-slate-300 overflow-x-auto border border-slate-800 max-h-40"><code>function doPost(e) {
-  var lock = LockService.getScriptLock();
-  lock.tryLock(10000);
-  try {
-    var data = JSON.parse(e.postData.contents);
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName(data.action);
-    if (!sheet) {
-      sheet = ss.insertSheet(data.action);
-    }
-    if (data.action === 'Frequencia') {
-      sheet.appendRow([data.date, data.professor, data.studentName, data.category, data.belt, data.status]);
-    } else if (data.action === 'Alunos' || data.action === 'Professores') {
-      // Clear and rewrite or append
-      sheet.appendRow([JSON.stringify(data.payload)]);
-    }
-    return ContentService.createTextOutput(JSON.stringify({result: "success"})).setMimeType(ContentService.MimeType.JSON);
-  } catch (f) {
-    return ContentService.createTextOutput(JSON.stringify({result: "error", error: f.toString()})).setMimeType(ContentService.MimeType.JSON);
-  } finally {
-    lock.releaseLock();
-  }
-}</code></pre>
-                </div>
-            </div>
-
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-2">
-                <h3 class="font-bold text-xs text-rose-400 uppercase tracking-wider">Dados Locais</h3>
-                <p class="text-xs text-slate-400">Limpar todos os dados salvos no navegador (resetar app).</p>
-                <button onclick="resetLocalStorage()" class="w-full bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 font-bold py-2 px-3 rounded-xl border border-rose-500/30 text-xs">
-                    Resetar Todos os Dados
-                </button>
-            </div>
-        </section>
-
     </main>
 
     <!-- Student Modal (Add/Edit) -->
@@ -352,6 +277,11 @@
     </nav>
 
     <script>
+        // =========================================================================
+        // INSIRA A SUA URL DO GOOGLE APPS SCRIPT NA LINHA ABAIXO:
+        // =========================================================================
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxgmvVw11IScg46FqEyzGf1mEkk6qeokTHKnuFa4hhIsUgjALocg388PJM9QLcq-Tk/exec';
+
         // --- State Management ---
         let state = {
             students: JSON.parse(localStorage.getItem('bjj_students')) || [
@@ -375,8 +305,7 @@
                 { name: 'Marrom', color: '#78350f' },
                 { name: 'Preta', color: '#0f172a' }
             ],
-            attendanceLogs: JSON.parse(localStorage.getItem('bjj_attendance')) || [],
-            sheetsUrl: localStorage.getItem('bjj_sheets_url') || ''
+            attendanceLogs: JSON.parse(localStorage.getItem('bjj_attendance')) || []
         };
 
         // Save state to localStorage
@@ -386,7 +315,50 @@
             localStorage.setItem('bjj_categories', JSON.stringify(state.categories));
             localStorage.setItem('bjj_belts', JSON.stringify(state.belts));
             localStorage.setItem('bjj_attendance', JSON.stringify(state.attendanceLogs));
-            localStorage.setItem('bjj_sheets_url', state.sheetsUrl);
+        }
+
+        // FUNÇÃO ADICIONADA: Busca histórico de frequências direto do Sheets ao abrir
+        async function loadDataFromSheets() {
+            const statusEl = document.getElementById('sync-status');
+            if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('SUA_URL_AQUI')) {
+                if (statusEl) statusEl.innerHTML = `<span class="text-amber-400"><i class="fa-solid fa-triangle-exclamation"></i> Configure a URL do Apps Script</span>`;
+                return;
+            }
+
+            if (statusEl) statusEl.innerHTML = `<span class="text-amber-400"><i class="fa-solid fa-sync fa-spin"></i> Baixando dados...</span>`;
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL);
+                const data = await response.json();
+
+                if (data && data.logs && Array.isArray(data.logs)) {
+                    // Mapeia logs puxados da planilha para a estrutura do app
+                    const mappedLogs = data.logs.map(l => {
+                        let matchedStudent = state.students.find(s => s.name === l.studentName);
+                        return {
+                            id: l.id || ('att_' + Date.now()),
+                            date: l.date,
+                            professor: l.professor,
+                            studentId: matchedStudent ? matchedStudent.id : ('s_' + l.studentName),
+                            studentName: l.studentName,
+                            category: l.category,
+                            belt: l.belt,
+                            status: l.status || 'Presente'
+                        };
+                    });
+
+                    state.attendanceLogs = mappedLogs;
+                    persist();
+
+                    if (statusEl) statusEl.innerHTML = `<span class="text-emerald-400"><i class="fa-solid fa-cloud"></i> Sincronizado com Google Sheets</span>`;
+                    
+                    // Atualiza a visualização do relatório se estiver aberto
+                    generateReport();
+                }
+            } catch (err) {
+                console.error("Erro ao puxar dados da planilha:", err);
+                if (statusEl) statusEl.innerHTML = `<span class="text-slate-400"><i class="fa-solid fa-database"></i> Usando dados locais (Offline)</span>`;
+            }
         }
 
         // --- Toast Notifications ---
@@ -426,7 +398,6 @@
             if (tabId === 'alunos') renderStudentsList();
             if (tabId === 'cadastros') renderCadastros();
             if (tabId === 'relatorios') initReportTab();
-            if (tabId === 'config') document.getElementById('sheets-url').value = state.sheetsUrl;
         }
 
         // --- Tab 1: Lançar Aula ---
@@ -539,24 +510,27 @@
 
             state.attendanceLogs.push(...logEntries);
             persist();
-            showToast('Frequência salva com sucesso!');
+            showToast('Frequência salva no dispositivo!');
 
-            // Sync with Google Sheets if configured
-            if (state.sheetsUrl) {
-                showToast('Enviando para o Google Sheets...', 'info');
-                for (let entry of logEntries) {
-                    try {
-                        await fetch(state.sheetsUrl, {
+            // Envio automático para o Google Sheets via Apps Script
+            if (APPS_SCRIPT_URL && !APPS_SCRIPT_URL.includes('SUA_URL_AQUI')) {
+                showToast('Enviando para a planilha...', 'info');
+                try {
+                    for (let entry of logEntries) {
+                        await fetch(APPS_SCRIPT_URL, {
                             method: 'POST',
                             mode: 'no-cors',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ action: 'Frequencia', ...entry })
                         });
-                    } catch (e) {
-                        console.error('Sync error:', e);
                     }
+                    showToast('Lançamento salvo com sucesso no Google Sheets!');
+                } catch (e) {
+                    console.error('Erro de envio:', e);
+                    showToast('Erro ao sincronizar com Google Sheets.', 'error');
                 }
-                showToast('Sincronizado com Google Sheets!');
+            } else {
+                showToast('Aviso: Substitua a constante APPS_SCRIPT_URL no código para enviar para o Google Sheets.', 'warning');
             }
         }
 
@@ -783,21 +757,22 @@
 
             // Group by student summary
             let summary = {};
+            
+            // Adiciona primeiro os alunos cadastrados
             state.students.forEach(s => {
                 if (!studentId || s.id === studentId) {
                     summary[s.id] = { name: s.name, category: s.category, belt: s.belt, present: 0, totalClasses: 0 };
                 }
             });
 
-            // Count unique dates / classes or total logs
-            let uniqueDates = [...new Set(logs.map(l => l.date))];
-
+            // Adiciona presenças trazidas do Google Sheets
             logs.forEach(l => {
-                if (summary[l.studentId]) {
-                    summary[l.studentId].totalClasses++;
-                    if (l.status === 'Presente') {
-                        summary[l.studentId].present++;
-                    }
+                if (!summary[l.studentId]) {
+                    summary[l.studentId] = { name: l.studentName, category: l.category, belt: l.belt, present: 0, totalClasses: 0 };
+                }
+                summary[l.studentId].totalClasses++;
+                if (l.status === 'Presente') {
+                    summary[l.studentId].present++;
                 }
             });
 
@@ -829,58 +804,11 @@
             window.print();
         }
 
-        // --- Tab 5: Config & Sync ---
-        function saveSheetsConfig() {
-            state.sheetsUrl = document.getElementById('sheets-url').value;
-            persist();
-            showToast('Configuração do Google Sheets salva!');
-            document.getElementById('sync-status').innerText = state.sheetsUrl ? 'Google Sheets Conectado' : 'Modo Local (Offline)';
-        }
-
-        async function syncNow() {
-            if (!state.sheetsUrl) {
-                showToast('Informe a URL do Web App primeiro.', 'warning');
-                return;
-            }
-            showToast('Sincronizando dados...', 'info');
-            // Sync students & professors
-            try {
-                await fetch(state.sheetsUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'Alunos', payload: state.students })
-                });
-                showToast('Sincronização concluída com sucesso!');
-            } catch (e) {
-                showToast('Erro ao sincronizar. Verifique a URL.', 'error');
-            }
-        }
-
-        function copyAppsScriptCode() {
-            const code = document.querySelector('pre code').innerText;
-            document.execCommand('copy');
-            // Fallback for clipboard API if needed
-            navigator.clipboard.writeText(code).then(() => {
-                showToast('Código copiado para a área de transferência!');
-            }).catch(() => {
-                showToast('Código copiado!', 'success');
-            });
-        }
-
-        function resetLocalStorage() {
-            if (confirm('Tem certeza que deseja apagar todos os dados locais?')) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
         // Initialize App on Load
         window.onload = function() {
-            if (state.sheetsUrl) {
-                document.getElementById('sync-status').innerText = 'Google Sheets Conectado';
-            }
             switchTab('lancar');
+            // Carrega os dados salvos da planilha automaticamente ao abrir
+            loadDataFromSheets();
         };
     </script>
 </body>
