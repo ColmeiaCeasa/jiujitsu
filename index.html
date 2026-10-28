@@ -31,7 +31,7 @@
             .print-only { display: block !important; }
             .print-container { width: 100% !important; margin: 0 !important; padding: 0 !important; max-width: none !important; background: white !important; border: none !important; }
             table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; font-size: 11px; color: black !important; }
+            th, td { border: 1px solid #cbd5e1; padding: 10px; text-align: left; font-size: 12px; color: black !important; }
             th { background-color: #f1f5f9 !important; }
         }
         .print-only { display: none; }
@@ -58,8 +58,8 @@
         </button>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto pb-24 p-4 max-w-md mx-auto w-full">
+    <!-- Main Content (Expandido para acomodar melhor o relatório em telas maiores/celular) -->
+    <main class="flex-1 overflow-y-auto pb-24 p-4 max-w-lg mx-auto w-full">
 
         <!-- TAB 1: LANÇAR AULA -->
         <section id="tab-lancar" class="tab-content space-y-4">
@@ -252,7 +252,7 @@
     </div>
 
     <!-- Bottom Navigation -->
-    <nav class="bg-slate-900 border-t border-slate-800 fixed bottom-0 left-0 right-0 z-40 no-print max-w-md mx-auto flex justify-around py-2 px-1 shadow-2xl">
+    <nav class="bg-slate-900 border-t border-slate-800 fixed bottom-0 left-0 right-0 z-40 no-print max-w-lg mx-auto flex justify-around py-2 px-1 shadow-2xl">
         <button onclick="switchTab('lancar')" id="nav-lancar" class="flex flex-col items-center justify-center flex-1 py-1 text-amber-400 transition">
             <i class="fa-solid fa-clipboard-user text-sm mb-0.5"></i>
             <span class="text-[9px] font-medium">Lançar</span>
@@ -809,7 +809,6 @@
             });
 
             logs.forEach(l => {
-                // Se o aluno do log não estiver mais na lista de alunos cadastrados, cria um registro temporário usando o nome que veio do log
                 let sId = l.studentId || ('s_' + l.studentName);
                 if (!summary[sId]) {
                     summary[sId] = { name: l.studentName, category: l.category || 'Geral', belt: l.belt || 'Branca', present: 0, absent: 0 };
@@ -828,17 +827,17 @@
                 
                 return `
                     <tr>
-                        <td style="padding: 10px; border-bottom: 1px solid #334155;">
-                            <div style="font-weight: bold; color: #ffffff !important; font-size: 13px;">${st.name}</div>
-                            <div style="font-size: 11px; color: #cbd5e1 !important;">${st.category} • Faixa ${st.belt}</div>
+                        <td style="padding: 12px 10px; border-bottom: 1px solid #334155; width: 45%;">
+                            <div style="font-weight: bold; color: #ffffff !important; font-size: 14px; line-height: 1.2;">${st.name}</div>
+                            <div style="font-size: 11px; color: #94a3b8 !important; margin-top: 2px;">${st.category} • Faixa ${st.belt}</div>
                         </td>
-                        <td style="padding: 10px; border-bottom: 1px solid #334155; text-align: center; color: #34d399; font-weight: bold;">
+                        <td style="padding: 12px 6px; border-bottom: 1px solid #334155; text-align: center; color: #34d399; font-weight: bold; font-size: 13px; width: 18%;">
                             ${st.present}
                         </td>
-                        <td style="padding: 10px; border-bottom: 1px solid #334155; text-align: center; color: #f87171; font-weight: bold;">
+                        <td style="padding: 12px 6px; border-bottom: 1px solid #334155; text-align: center; color: #f87171; font-weight: bold; font-size: 13px; width: 18%;">
                             ${st.absent}
                         </td>
-                        <td style="padding: 10px; border-bottom: 1px solid #334155; text-align: right; color: #fbbf24; font-weight: bold;">
+                        <td style="padding: 12px 10px; border-bottom: 1px solid #334155; text-align: right; color: #fbbf24; font-weight: bold; font-size: 13px; width: 19%;">
                             ${percentual}%
                         </td>
                     </tr>
@@ -850,14 +849,14 @@
                     <h2 class="text-lg font-bold" style="color: black !important;">Relatório de Frequência - Jiu-Jitsu</h2>
                     <p class="text-xs" style="color: #475569 !important;">Período: ${startDate ? startDate.split('-').reverse().join('/') : 'Início'} até ${endDate ? endDate.split('-').reverse().join('/') : 'Hoje'}</p>
                 </div>
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <div style="overflow-x: auto; width: 100%;">
+                    <table style="width: 100%; border-collapse: collapse; min-width: 300px;">
                         <thead>
                             <tr style="border-bottom: 2px solid #475569; text-align: left; color: #94a3b8;">
-                                <th style="padding: 8px; color: #cbd5e1;">Aluno</th>
-                                <th style="padding: 8px; text-align: center; color: #cbd5e1;">Presenças</th>
-                                <th style="padding: 8px; text-align: center; color: #cbd5e1;">Faltas</th>
-                                <th style="padding: 8px; text-align: right; color: #cbd5e1;">% Freq.</th>
+                                <th style="padding: 10px; color: #cbd5e1; font-size: 12px; width: 45%;">Aluno</th>
+                                <th style="padding: 10px 6px; text-align: center; color: #cbd5e1; font-size: 12px; width: 18%;">Pres.</th>
+                                <th style="padding: 10px 6px; text-align: center; color: #cbd5e1; font-size: 12px; width: 18%;">Faltas</th>
+                                <th style="padding: 10px; text-align: right; color: #cbd5e1; font-size: 12px; width: 19%;">% Freq.</th>
                             </tr>
                         </thead>
                         <tbody>
